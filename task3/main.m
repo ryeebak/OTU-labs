@@ -15,12 +15,75 @@ sys_2 = tf(k*k1, [T*T1, T+T1, 1, k*k1]);
 A1 = calculateAmplitudeMargin(sys_1);
 P1 = calculatePhaseMargin(sys_1);
 doPlot(sys_1, 'Разомкнутая система', A1, P1)
-customMargin(sys_1, 'Разомкнутая система')
+w_crossing_1 = customMargin(sys_1, 'Разомкнутая система');
 
 A2 = calculateAmplitudeMargin(sys_2);
 P2 = calculatePhaseMargin(sys_2);
 doPlot(sys_2, 'Замкнутая система', A2, P2)
-customMargin(sys_2, 'Замкнутая система')
+w_crossing_2 = customMargin(sys_2, 'Замкнутая система');
+
+%%%%%%%%%
+
+figure;
+subplot(2, 1, 1);
+
+[mag, ~, wout] = bode(sys_1);
+
+mag = squeeze(mag) ;
+semilogx(wout,mag2db(abs(mag)));
+grid on
+
+legend('sys_1') ;
+title('ЛАЧХ разомкнутой САУ');
+ylabel('Амплитуда, дБ');
+xlabel('Частота, Гц');
+hold on
+%plot([1 100], ylim, 'r--');
+subplot(2, 1, 2);
+
+[~, phase, wout] = bode(sys_1);
+phase = squeeze(phase) ;
+semilogx(wout, phase);
+
+grid on
+
+legend('sys_1') ;
+title('ЛФЧХ разомкнутой САУ')
+
+ylabel('Фаза градусы');
+xlabel('Частота, Гц');
+
+%%%%%%%%%%
+
+figure;
+subplot(2, 1, 1);
+
+[mag, ph, wout] = bode(sys_2);
+
+mag = squeeze(mag) ;
+semilogx(wout,mag2db(abs(mag)));
+grid on
+
+legend('sys_1') ;
+title('ЛАЧХ разомкнутой САУ');
+ylabel('Амплитуда, дБ');
+xlabel('Частота, Гц');
+
+subplot(2, 1, 2);
+
+[mag, phase, wout] = bode(sys_2);
+phase = squeeze(phase) ;
+semilogx(wout, phase);
+
+grid on
+
+legend('sys_1') ;
+title('ЛФЧХ разомкнутой САУ')
+
+ylabel('Фаза градусы');
+xlabel('Частота, Гц');
+
+%%%%%%%
 
 % Нахождение устойчивости по амплитуде
 function AmplitudeMargin = calculateAmplitudeMargin(sys)
@@ -88,7 +151,7 @@ function doPlot(sys, name, A, P)
     margin(sys)
 end
 
-function customMargin(sys, name)
+function w_crossing = customMargin(sys, name)
     [mag, phase, wout] = bode(sys);
     [~, ind] = min(abs(squeeze(phase) + 180));
     w_crossing_phase = wout(ind);
@@ -101,4 +164,5 @@ function customMargin(sys, name)
     fprintf('Запас фазы: %.2f градусов\n', Pm);
     fprintf('Частота среза по усилению: %.2f рад/с\n', w_crossing_amplitude);
     fprintf('Частота среза по фазе: %.2f рад/с\n\n', w_crossing_phase);
+    w_crossing = [w_crossing_phase, w_crossing_amplitude];
 end
