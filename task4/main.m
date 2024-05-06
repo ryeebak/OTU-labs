@@ -13,6 +13,8 @@ T_list = [];
 K_list = [];
 i = 0;
 hold on
+%A1 red A3 blue
+%Ts = [0.1, 0.2, 0.3, 0.5, 1, 1.5, 2, 2.5, 3, 4 ,5];
 
 for T = 0.1:0.35:5
     Njw= T1* T *((w.*j).^3)+ T +T1*((w.*j).^2)+(w.*j)+K1*K;
@@ -67,8 +69,8 @@ pplot3 = plot(1.5, 0.7, '*b');
 pplot3.LineWidth = 1;
 
 text(0.791, 0.59, "A_2: (0.761, 0.56)", "Color", "black", 'FontSize', 14)
-text(0.33, 0.33, "A_1: (0.5, 0.4)", 'Color', 'red', 'FontSize', 14)
-text(1.53, 0.73, "A_3: (0.85, 0.7)", 'Color', 'blue', 'FontSize', 14)
+text(0.33, 0.33, "A_1: (0.3, 0.3)", 'Color', 'red', 'FontSize', 14)
+text(1.53, 0.73, "A_3: (1.5, 0.7)", 'Color', 'blue', 'FontSize', 14)
 hold off
 k_check = [0.3, 0.56, 0.7];
 t_check = [0.3, 0.761, 1.5];
