@@ -1,173 +1,200 @@
 clear, clc
 
 T1 = 0.7;
-K1 = 1.6;
-K = 1;
-t1 = tiledlayout(5, 4);
-title(t1, "LR 04");
-nexttile([2, 2])
-w=0:0.1:5;
-color_index = 0;
-legends_ = [];
-T_list = [];
-K_list = [];
-i = 0;
-hold on
-%A1 red A3 blue
-%Ts = [0.1, 0.2, 0.3, 0.5, 1, 1.5, 2, 2.5, 3, 4 ,5];
+k1 = 1.6;
 
-for T = 0.1:0.35:5
-    Njw= T1* T *((w.*j).^3)+ T +T1*((w.*j).^2)+(w.*j)+K1*K;
-    Re = real(Njw);
-    Im = imag(Njw);
-    my_plot = plot(Re, Im);
-    my_plot.LineWidth = 2;
-    my_color = [1 - color_index*0.07, 0, 0 + color_index*0.07];
-    my_plot.Color = my_color;
-    legends_ = [legends_, ("T = " + num2str( T ))];
-    xlabel('Re(W)')   
-    ylabel('Im(W)')
-    title("Годограф Михайлова")
-    color_index = color_index + 1;
-end
-for T = 0.1:0.01:5
-    for k = 0.001:0.01:5
-        Njw= T1*T*((w.*j).^3)+T+T1*((w.*j).^2)+(w.*j)+K1*k;
-        Re_ = real(Njw);
-        Im_ = imag(Njw);
-        zer = find(abs(Re_) == min(abs(Re_)));
-        if abs(Re_(zer)) < 0.02 && abs(Im_(zer)) <= 0.02
-            T_list = [T_list, T];
-            K_list = [K_list, k];
-            break
+T = 0.1;
+k_1 = 0;
+k_2 = 7.145;
+
+B_1 = k_1*k1;
+B_2 = k_2*k1;
+A_1=[T1*T, T1+T,1, k_1*k1];
+A_2=[T1*T, T1+T,1, k_2*k1];
+
+
+T_3 = 1.7;
+T_31 = 4;
+
+k_31 = 0.1;
+k_32 = 3.0;
+k_33 = 1.05;
+
+figure('Name', 'Годограф Михайлова при k = 0');
+
+w=0.001:0.01:10;
+GM=freqs(A_1, 1, w);
+U=real(GM);
+V=imag(GM);
+plot(U,V); 
+hold on
+plot(0,0,'r+');
+grid on
+xlabel('Re, sec^-^1')
+ylabel('Im, sec^-^1')
+title('Годограф Михайлова при k = 0');
+
+figure('Name', 'Годограф Михайлова на границе устойчивости');
+
+w=0.001:0.01:10;
+GM=freqs(A_2, 1, w);
+U=real(GM);
+V=imag(GM);
+plot(U,V); 
+hold on
+plot(0,0,'r+');
+grid on
+xlabel('Re, sec^-^1')
+ylabel('Im, sec^-^1')
+title('Годограф Михайлова на границе устойчивости (k = k_к = 7.145)');
+
+figure('Name', 'Граница области устойчивости');
+T=[0.1, 0.5, 0.7, 0.9,  1.3, 1.7, 2.1 ,2.5, 3, 3.5, 4, 4.5, 5];
+k=[7.15, 2.15, 1.80, 1.60, 1.38, 1.26, 1.19, 1.14, 1.10, 1.07, 1.05, 1.03, 1.02];
+
+plot(T,k);
+hold on
+plot(0.7,0.1,'r*');  
+plot(1.7,3.0,'b*');
+plot(1.7,1.26,'g*');
+grid on
+xlabel('T, sec')
+ylabel('Kкр')
+title('Граница устойчивости системы');
+legend('Граница устойчивости', 'Система устойчива', 'Система не устойчива', 'Система на границе устойчивости')
+
+name = 'Устойчивая система (ниже границы устойчивости)';
+road = 'graphics/Устойчивая система.png';
+color = 'r-';
+road1 = 'graphics/Устойчивая система Михайлов.png';
+lab_otu_dynamic_plot(T_3, k_31, T1, k1, name, road, color);
+
+name = 'Неустойчивая система (выше границы устойчивости)';
+road = 'graphics/Неустойчивая система.png';
+road1 = 'graphics/Неустойчивая система Михайлов.png';
+color = 'b-';
+lab_otu_dynamic_plot(T_3, k_32, T1, k1, name, road, color);
+
+name = 'Система на границе устойчивости';
+road = 'graphics/На границе устойчивости.png';
+color = 'g-';
+road1 = 'graphics/На границе устойчивости Михайлов.png';
+lab_otu_dynamic_plot(T_31, k_33, T1, k1, name, road, color);
+
+figure('Name', 'Годограф Михайлова с разной устойчивостью');
+
+w = 0.001:0.01:10;
+
+GM1 = freqs([T1*T_3, T1+T_3,1, k_31*k1], 1, w);
+GM2 = freqs([T1*T_3, T1+T_3,1, k_32*k1], 1, w);
+GM3 = freqs([T1*T_31, T1+T_31,1, k_33*k1], 1, w);
+
+U1 = real(GM1);
+V1 = imag(GM1);
+
+U2 = real(GM2);
+V2 = imag(GM2);
+
+U3 = real(GM3);
+V3 = imag(GM3);
+
+plot(U1, V1, 'r', U2, V2, 'b', U3, V3, 'g');
+
+hold on
+plot(0,0,'r+');
+grid on
+legend('Устойчивая система', 'Неустойчивая система', 'Система на границе устойчивости')
+xlabel('Re, sec^-^1')
+ylabel('Im, sec^-^1')
+title('Годограф Михайлова с разной устойчивостью');
+xlim([-5 5])
+ylim([-5 2])
+
+function lab_otu_dynamic_plot(T, k, T1, k1, graph, road, color)
+    B = k*k1;
+    A = [T1*T, T1+T,1, k*k1];
+    W = tf(B, A);
+        if ~iscell(W)
+            W = {W};
+        end
+    figure('Position', [400, 200, 900, 750]);
+    title(graph)
+    subplot(3,2,1)
+    for k = 1 : 1 : length(W)
+        if isproper(W{k})
+            [x,t]=step(W{k}, 0:0.1:30);
+            plot(t, x, color);
+            hold on;
         end
     end
-end
-plot(zeros(1, 9), -5:1:3, '-k');
-plot(-20:1:5, zeros(1, 26), 'k');
-xline(0, 'k-');
-yline(0, 'k-');
-legends_ = [legends_, "Y_A_X_I_S", "X_A_X_I_S"];
-legend(legends_)
-hold off
-grid on
-axis([-15 10 -20 3])
-nexttile([2, 2])
-pplot = plot(K_list, T_list);
-pplot.LineWidth = 2;
-xlabel("T")
-ylabel("K(T)")
-grid on
-axis([-0.1 5 0 1.1])
-title("Отношение K(T)")
-hold on
-pplot1 = plot(0.761, 0.56, '*k');
-pplot1.LineWidth = 1;
-pplot2 = plot(0.3, 0.3, '*r');
-pplot2.LineWidth = 1;
-pplot3 = plot(1.5, 0.7, '*b');
-pplot3.LineWidth = 1;
+    hold off
+    grid minor
+    grid on;
+    title('Step Response')
+    xlabel('time, sec')
+    ylabel('Magnitude, dB')
+    subplot(3,2,2)
 
-text(0.791, 0.59, "A_2: (0.761, 0.56)", "Color", "black", 'FontSize', 14)
-text(0.33, 0.33, "A_1: (0.3, 0.3)", 'Color', 'red', 'FontSize', 14)
-text(1.53, 0.73, "A_3: (1.5, 0.7)", 'Color', 'blue', 'FontSize', 14)
-hold off
-k_check = [0.3, 0.56, 0.7];
-t_check = [0.3, 0.761, 1.5];
-colors = ["-r", "-k", "-b"];
+    for k = 1 : 1 : length(W)
+        if isproper(W{k})
+            [x,t]=impulse(W{k}, 0:0.1:30);
+            plot(t, x, color);
+            hold on;
+        end
+    end
 
-% step
-nexttile([1, 2]);
-hold on
-for iterator = 1:1:3
-    K = k_check(iterator);
-    T = t_check(iterator);
-    KS = tf(K1*K, [T1*T, (T+T1), 1, K1*K]);
-    [y1, tOut] = step(KS, 4);
-    plot(tOut, y1, colors(iterator));
-end
-legend('A_1', 'A_2', 'A_3')
-grid on
-title('Реакция на единичное воздействие "step"')
-xlabel('t, c');
-ylabel('x(t)');
-hold off
+    hold off
+    grid minor
+    grid on;
+    title('Impulse Response')
+    xlabel('time, sec')
+    ylabel('Magnitude, dB')
+    subplot(3,2,[3,5])
+   
+    for k = 1 : 1 : length(W)
+        if isproper(W{k})
+            hold on;
+            bode(W{k}, color);
+            grid on;
+        end
+    end
+    hold off;
+    subplot(3,2,4)
 
-%Реакция на impulse
-nexttile([1, 2]);
-hold on
-for iterator = 1:1:3
-    K = k_check(iterator);
-    T = t_check(iterator);
-    KS = tf(K1*K, [T1*T, (T+T1), 1, K1*K]);
-    [y1, tOut] = impulse(KS, 4);
-    plot(tOut, y1, colors(iterator));
-end
-legend('A_1', 'A_2', 'A_3')
-grid on
-title('Реакция на единичное воздействие "impulse"')
-xlabel('t, c');
-ylabel('x(t)');
-hold off
+    for k = 1 : 1 : length(W)
+        if isproper(W{k})
+            hold on;
+            nyquist(W{k}, color);
+        end
+    end
 
-% ЛАЧХ
-nexttile([1, 2])
-hold on
-for iterator = 1:1:3
-    K = k_check(iterator);
-    T = t_check(iterator);
-    KS = tf(K1*K, [T1*T, (T+T1), 1, K1*K]);
-    [mag, ph, wout] = bode(KS, colors(iterator));
-    mag = squeeze (mag);
-    semilogx(wout, mag2db(abs(mag)));
-end
-plot([0 4], [0 0], '-k')
-legend('A_1', 'A_2', 'A_3', 'axis')
-grid on
-title ('ЛАЧХ');
-ylabel ('Амплитуда, ДБ');
-xlabel ('Частота, Гц');
-axis([0 4 -40 15])
-hold off
+    hold off
+    grid minor
+    grid on;
+    title('Nyquist Diagram')
+    xlabel('Real Axis, sec^-^1')
+    ylabel('Imaginary Axis, sec^-^1')
+    hold off;
+    subplot(3,2,6)
 
-% ЛФЧХ
-nexttile(17, [1, 2])
-hold on
-for iterator = 1:1:3
-    K = k_check(iterator);
-    T = t_check(iterator);
-    KS = tf(K1*K, [T1*T, (T+T1), 1, K1*K]);
-    [mag, phase, wout] = bode(KS, colors(iterator));
-    phase = squeeze (phase);
-    semilogx(wout, phase);
-end
-plot([0 4], [-180 -180], '-k')
-legend('A_1', 'A_2', 'A_3', 'axis')
-grid on
-title ('ЛФЧХ')
-ylabel ('Фаза, градусы');
-xlabel ('Частота, Гц');
-axis([0 4 -250 5])
-hold off
+    for k = 1 : 1 : length(W)
+        if isproper(W{k})
+            pzmap(W{k}, color);
+            title('Pole-Zero Map');
+            axis([-3 2 -2 2]);
+        end
+    end
 
-% Годограф Найквиста
-nexttile(15, [2, 2])
-k = 1000;
-w = linspace(-k, k, 500*k);
-hold on
-for iterator = 1:1:3
-    K = k_check(iterator);
-    T = t_check(iterator);
-    KS = tf(K1*K, [T1*T, (T+T1), 1, K1*K]);
-    [re, im, wout] = nyquist(KS, w, colors(iterator));
-    re = squeeze(re);
-    im = squeeze(im);
-    plot(re, im)
+    figure('Name', 'Годограф Михайлова');
+    w=0.001:0.01:10;
+    GM=freqs(A, 1, w);
+    U=real(GM);
+    V=imag(GM);
+    plot(U,V, color); 
+    hold on
+    plot(0,0, 'r+');
+    grid on
+    xlabel('Re, sec^-^1')
+    ylabel('Im, sec^-^1')
+    title(graph);
 end
-plot(-1, 0, '+r')
-legend('A_1', 'A_2', 'A_3', "Critical Point")
-grid on
-title('Годограф Найквиста')
-xlabel('Действительная ось');
-ylabel('Мнимая ось');
-hold off
